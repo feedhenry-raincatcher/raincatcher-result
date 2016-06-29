@@ -1,6 +1,6 @@
-# FeedHenry WFM Result
+# FeedHenry RainCatcher Result
 
-A result module for WFM, for working with the results of pushing a workorder through a workflow.
+A result module for RainCatcher, for working with the results of pushing a workorder through a workflow.
 
 This module provides :
 - An AngularJS Service
@@ -31,7 +31,7 @@ resultManager: function(resultSync) {
   return resultSync.managerPromise;
 },
 ```
-For a more complete example, please check the [demo portal app](https://github.com/feedhenry-staff/wfm-portal/blob/master/src/app/workorder/workorder.js).
+For a more complete example, please check the [demo portal app](https://github.com/feedhenry-raincatcher/raincatcher-demo-portal/blob/master/src/app/workorder/workorder.js).
 
 
 ##### `resultSync` API
@@ -54,7 +54,7 @@ the module broadcasts, and listens for the following events
 ## Usage in an express backend
 
 ### Setup
-The server-side component of this WFM module exports a function that takes express and mediator instances as parameters, as in:
+The server-side component of this RainCatcher module exports a function that takes express and mediator instances as parameters, as in:
 
 ```javascript
 var express = require('express')
@@ -73,4 +73,4 @@ require('fh-wfm-result/lib/server')(mediator, app, mbaasApi);
 
 ### Integration
 
-Check this [demo cloud application](https://github.com/feedhenry-staff/wfm-cloud/blob/master/lib/app/workorder.js)
+Check this [demo cloud application](https://github.com/feedhenry-raincatcher/raincatcher-demo-cloud/blob/master/lib/app/workorder.js)
