@@ -137,36 +137,36 @@ The following topics are published by this module. Developers are free to implem
 
 | Topic         | Description           |
 | ------------- |:-------------:| 
-| wfm:sync:results:create              |   Create a new item in the sync `results` collection |
-| wfm:sync:results:update              |   Update an existing item in the sync `results` collection |
-| wfm:sync:results:list              |   List all items in the sync `results` collection |
-| wfm:sync:results:remove              |   Remove an existing item from the sync `results` collection |
-| wfm:sync:results:read              |   Read a single item from the sync `results` collection |
-| wfm:sync:results:start              |   Start the sync process for sync `results` collection |
-| wfm:sync:results:stop              |   Stop the sync process for sync `results` collection |
-| wfm:sync:results:force_sync        |   Force a sync cycle from client to cloud for sync `results` collection |
+| wfm:results:create              |   Create a new item in the sync `results` collection |
+| wfm:results:update              |   Update an existing item in the sync `results` collection |
+| wfm:results:list              |   List all items in the sync `results` collection |
+| wfm:results:remove              |   Remove an existing item from the sync `results` collection |
+| wfm:results:read              |   Read a single item from the sync `results` collection |
+| wfm:results:start              |   Start the sync process for sync `results` collection |
+| wfm:results:stop              |   Stop the sync process for sync `results` collection |
+| wfm:results:force_sync        |   Force a sync cycle from client to cloud for sync `results` collection |
 
 
 ### Topic Subscriptions
 
 | Topic         | Description           |
 | ------------- |:-------------:| 
-| done:wfm:sync:results:create        |   A result was created in the `results` dataset |
-| error:wfm:sync:results:create        |   An error occurred when creating an item in the `results` dataset. |
-| done:wfm:sync:results:update        |   A result was updated in the `results` dataset |
-| error:wfm:sync:results:update        |   An error occurred when updating an item in the `results` dataset. |
-| done:wfm:sync:results:list        |   A list of the items in the `results` dataset completed |
-| error:wfm:sync:results:list        |   An error occurred when listing items in the `results` dataset. |
-| done:wfm:sync:results:remove        |   A result was removed from the `results` dataset |
-| error:wfm:sync:results:remove        |   An error occurred when removing an item in the `results` dataset. |
-| done:wfm:sync:results:read        |   A item was read correctly from the `results` dataset |
-| error:wfm:sync:results:read        |   An error occurred when reading an item in the `results` dataset. |
-| done:wfm:sync:results:start        |   The sync process started for the `results` dataset. |
-| error:wfm:sync:results:start        |   An error occurred when starting the `results` dataset. |
-| done:wfm:sync:results:stop        |   The sync process stopped for the `results` dataset. |
-| error:wfm:sync:results:stop        |   An error occurred when stopping the `results` dataset sync process. |
-| done:wfm:sync:results:force_sync        |  A force sync process completed for the `results` dataset. |
-| error:wfm:sync:results:force_sync        |   An error occurred when forcing the sync process for the `results` dataset. |
+| done:wfm:results:create        |   A result was created in the `results` dataset |
+| error:wfm:results:create        |   An error occurred when creating an item in the `results` dataset. |
+| done:wfm:results:update        |   A result was updated in the `results` dataset |
+| error:wfm:results:update        |   An error occurred when updating an item in the `results` dataset. |
+| done:wfm:results:list        |   A list of the items in the `results` dataset completed |
+| error:wfm:results:list        |   An error occurred when listing items in the `results` dataset. |
+| done:wfm:results:remove        |   A result was removed from the `results` dataset |
+| error:wfm:results:remove        |   An error occurred when removing an item in the `results` dataset. |
+| done:wfm:results:read        |   A item was read correctly from the `results` dataset |
+| error:wfm:results:read        |   An error occurred when reading an item in the `results` dataset. |
+| done:wfm:results:start        |   The sync process started for the `results` dataset. |
+| error:wfm:results:start        |   An error occurred when starting the `results` dataset. |
+| done:wfm:results:stop        |   The sync process stopped for the `results` dataset. |
+| error:wfm:results:stop        |   An error occurred when stopping the `results` dataset sync process. |
+| done:wfm:results:force_sync        |  A force sync process completed for the `results` dataset. |
+| error:wfm:results:force_sync        |   An error occurred when forcing the sync process for the `results` dataset. |
 
 ### Mediator events
 the module broadcasts, and listens for the following events
