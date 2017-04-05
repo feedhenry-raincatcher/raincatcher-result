@@ -9,6 +9,7 @@ module.exports = function(grunt) {
     mochaTest: {
       test: {
         src: ['lib/**/*-spec.js'],
+        // src: ['lib/client/result-client/sync-events-store-spec.js'],
         options: {
           reporter: 'Spec',
           logErrors: true,
