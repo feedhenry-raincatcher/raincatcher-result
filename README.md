@@ -168,13 +168,6 @@ The following topics are published by this module. Developers are free to implem
 | done:wfm:sync:results:force_sync        |  A force sync process completed for the `results` dataset. |
 | error:wfm:sync:results:force_sync        |   An error occurred when forcing the sync process for the `results` dataset. |
 
-### Mediator events
-the module broadcasts, and listens for the following events
-
-| Listens for | Responds with |
-| ----------- | ------------- |
-| `wfm:appform:submission:complete` | `wfm:result:remote-update` |
-
 ## Usage in an express backend
 
 ### Setup
