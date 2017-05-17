@@ -1,12 +1,12 @@
 var mediator = require("fh-wfm-mediator/lib/mediator");
 var chai = require('chai');
 var _ = require('lodash');
-var CONSTANTS = require('../../constants');
+var CONSTANTS = require('../../lib/constants');
 
 var expect = chai.expect;
 
 var MediatorTopicUtility = require('fh-wfm-mediator/lib/topics');
-var ResultClient = require('../result-client');
+var ResultClient = require('../../lib/client/result-client');
 
 describe("Result Create Mediator Topic", function() {
 
@@ -33,7 +33,7 @@ describe("Result Create Mediator Topic", function() {
 
   beforeEach(function() {
     this.subscribers = {};
-    resultSubscribers.on(CONSTANTS.TOPICS.CREATE, require('./create')(resultSubscribers, resultClient));
+    resultSubscribers.on(CONSTANTS.TOPICS.CREATE, require('../../lib/client/mediator-subscribers/create')(resultSubscribers, resultClient));
   });
 
   afterEach(function() {

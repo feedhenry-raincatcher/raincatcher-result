@@ -25,7 +25,7 @@ var mediator = require('fh-wfm-mediator/lib/mediator.js');
  * Set of unit tests for the sync topic subscribers
  */
 describe('Result Sync', function() {
-  var resultServer = require('./index.js');
+  var resultServer = require('./../../lib/cloud/index.js');
 
   //Create
   it('should publish to done create cloud topic when the request to create a result has been completed', function() {
