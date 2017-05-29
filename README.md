@@ -1,4 +1,4 @@
-# FeedHenry WFM Result
+# FeedHenry WFM Result [![Coverage Status](https://coveralls.io/repos/github/feedhenry-raincatcher/raincatcher-result/badge.svg?branch=master)](https://coveralls.io/github/feedhenry-raincatcher/raincatcher-result?branch=master)
 
 A result module for WFM, for working with the results of pushing a workorder through a workflow.
 
