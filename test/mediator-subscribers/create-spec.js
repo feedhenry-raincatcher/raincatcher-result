@@ -2,6 +2,7 @@ var mediator = require("fh-wfm-mediator/lib/mediator");
 var chai = require('chai');
 var _ = require('lodash');
 var CONSTANTS = require('../../lib/constants');
+var Q = require('q');
 
 var expect = chai.expect;
 
@@ -16,15 +17,9 @@ describe("Result Create Mediator Topic", function() {
 
   var expectedCreatedResult =  _.extend({_localuid: "createdResultLocalId"}, mockResultToCreate);
 
-  var topicUid = 'testtopicuid1';
-
   var createTopic = "wfm:results:create";
-  var doneCreateTopic = "done:wfm:results:create:testtopicuid1";
-  var errorCreateTopic = "error:wfm:results:create:testtopicuid1";
 
   var syncCreateTopic = "wfm:sync:result:create";
-  var doneSyncCreateTopic = "done:wfm:sync:result:create";
-  var errorSyncCreateTopic = "error:wfm:sync:result:create";
 
   var resultSubscribers = new MediatorTopicUtility(mediator);
   resultSubscribers.prefix(CONSTANTS.TOPIC_PREFIX).entity(CONSTANTS.RESULT_ENTITY_NAME);
@@ -47,31 +42,20 @@ describe("Result Create Mediator Topic", function() {
   it('should use the sync topics to create a result', function() {
     this.subscribers[syncCreateTopic] = mediator.subscribe(syncCreateTopic, function(parameters) {
       expect(parameters.itemToCreate).to.deep.equal(mockResultToCreate);
-      expect(parameters.topicUid).to.be.a('string');
 
-      mediator.publish(doneSyncCreateTopic + ":" + parameters.topicUid, expectedCreatedResult);
+      return Q.resolve(expectedCreatedResult);
     });
 
-    var donePromise = mediator.promise(doneCreateTopic);
-
-    mediator.publish(createTopic, {
-      resultToCreate: mockResultToCreate,
-      topicUid: topicUid
-    });
-
-    return donePromise.then(function(createdResult) {
+    return mediator.publish(createTopic, {
+      resultToCreate: mockResultToCreate
+    }).then(function(createdResult) {
       expect(createdResult).to.deep.equal(expectedCreatedResult);
     });
   });
 
   it('should publish an error if there is no object to update', function() {
-    var errorPromise = mediator.promise(errorCreateTopic);
-
-    mediator.publish(createTopic, {
-      topicUid: topicUid
-    });
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(createTopic, {
+    }).catch(function(error) {
       expect(error.message).to.have.string("Invalid Data");
     });
   });
@@ -80,19 +64,13 @@ describe("Result Create Mediator Topic", function() {
     var expectedError = new Error("Error performing sync operation");
     this.subscribers[syncCreateTopic] = mediator.subscribe(syncCreateTopic, function(parameters) {
       expect(parameters.itemToCreate).to.deep.equal(mockResultToCreate);
-      expect(parameters.topicUid).to.be.a('string');
 
-      mediator.publish(errorSyncCreateTopic + ":" + parameters.topicUid, expectedError);
+      return Q.reject(expectedError);
     });
 
-    var errorPromise = mediator.promise(errorCreateTopic);
-
-    mediator.publish(createTopic, {
-      resultToCreate: mockResultToCreate,
-      topicUid: topicUid
-    });
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(createTopic, {
+      resultToCreate: mockResultToCreate
+    }).catch(function(error) {
       expect(error).to.deep.equal(expectedError);
     });
   });

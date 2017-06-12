@@ -3,6 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var app = express();
 var mockMbaasApi = {};
+var Q = require('q');
 
 var CLOUD_TOPICS = {
   create: "wfm:cloud:result:create",
@@ -19,7 +20,7 @@ var CLOUD_DATA_TOPICS = {
   delete: "wfm:cloud:data:result:delete"
 };
 var DONE = 'done:';
-var mediator = require('fh-wfm-mediator/lib/mediator.js');
+var mediator = require('fh-wfm-mediator/lib/mediator');
 
 /**
  * Set of unit tests for the sync topic subscribers
@@ -31,17 +32,16 @@ describe('Result Sync', function() {
   it('should publish to done create cloud topic when the request to create a result has been completed', function() {
     var mockResultCreate = {value: 'test-result-create'};
     var expectedResultVal = 'test-result-create';
-    var topicId = "testId";
 
-    resultServer(mediator, app, mockMbaasApi);
+    resultServer(mediator);
 
     //Mock of the data topic subscriber in the storage module
     mediator.subscribe(CLOUD_DATA_TOPICS.create, function(createdResult) {
       //Publish to done create data topic to fake result creation by storage module
-      mediator.publish(DONE + CLOUD_DATA_TOPICS.create + ':' + createdResult.id, createdResult);
+      return Q.resolve(createdResult);
     });
 
-    return mediator.request(CLOUD_TOPICS.create, [mockResultCreate, topicId], {uid: topicId}).then(function(createdResult) {
+    return mediator.request(CLOUD_TOPICS.create, [mockResultCreate]).then(function(createdResult) {
       expect(createdResult, 'Created result received should not be null or undefined').to.exist;
       expect(createdResult, 'Created result received should be an object').to.be.an('object');
       expect(createdResult.value, 'Created result received should have the same value as the original object passed').to.equal(expectedResultVal);
@@ -59,12 +59,12 @@ describe('Result Sync', function() {
       {id: 'test-result-2', value:'test-result'},
       {id: 'test-result-3', value:'test-result'}];
 
-    resultServer(mediator, app, mockMbaasApi);
+    resultServer(mediator);
 
     //Mock of the data topic subscriber in the storage module
     mediator.subscribe(CLOUD_DATA_TOPICS.list, function(filter) {
       //Publish to done list data topic to fake getting the list of results by storage module
-      mediator.publish(DONE + CLOUD_DATA_TOPICS.list + ":" + filter.topicUid, mockResultArray);
+      return Q.resolve(mockResultArray);
     });
 
     return mediator.request(CLOUD_TOPICS.list).then(function(listResult) {
@@ -85,10 +85,10 @@ describe('Result Sync', function() {
     //Mock of the data topic subscriber in the storage module
     mediator.subscribe(CLOUD_DATA_TOPICS.update, function(resultToUpdate) {
       //Publish to done update data topic to fake getting the update of results by storage module
-      mediator.publish(DONE + CLOUD_DATA_TOPICS.update + ':' + resultToUpdate.id, resultToUpdate);
+      return Q.resolve(resultToUpdate);
     });
 
-    return mediator.request(CLOUD_TOPICS.update, mockResultUpdate, {uid: mockResultUpdate.id}).then(function(updatedResult) {
+    return mediator.request(CLOUD_TOPICS.update, mockResultUpdate).then(function(updatedResult) {
       expect(updatedResult, 'Updated result received should not be null or undefined').to.exist;
       expect(updatedResult, 'Updated result received should be an object').to.be.an('object');
       expect(updatedResult, 'Updated result received should have the same value as the updated result sent by the mock storage module').to.deep.equal(expectedResultUpdated);
@@ -99,21 +99,20 @@ describe('Result Sync', function() {
   it('should publish to done read cloud topic when the request to read a result has been completed', function() {
     var mockResultRead = {id:'testID', value: 'result-read'};
     var expectedResultRead = {id:'testID', value: 'result-read'};
-    var uid = "testID";
 
-    resultServer(mediator, app, mockMbaasApi);
+    resultServer(mediator);
 
     //Mock of the data topic subscriber in the storage module
     mediator.subscribe(CLOUD_DATA_TOPICS.read, function(uid) {
+      expect(uid).to.equal(mockResultRead.id);
       //Publish to done read data topic to fake the reading of results by storage module
-      mediator.publish(DONE + CLOUD_DATA_TOPICS.read + ':' + uid, mockResultRead);
+      return Q.resolve(mockResultRead);
     });
 
-    return mediator.request(CLOUD_TOPICS.read, uid).then(function(readResult) {
+    return mediator.request(CLOUD_TOPICS.read, mockResultRead.id).then(function(readResult) {
       expect(readResult, 'Read result received should not be null or undefined').to.exist;
       expect(readResult, 'Read result received should be an object').to.be.an('object');
       expect(readResult, 'Read result received should have the same value as the read result sent by the mock storage module').to.deep.equal(expectedResultRead);
-
     });
   });
 
@@ -127,8 +126,9 @@ describe('Result Sync', function() {
 
     //Mock of the data topic subscriber in the storage module
     mediator.subscribe(CLOUD_DATA_TOPICS.delete, function(uid) {
+      expect(uid).to.equal(mockResultDelete.id);
       //Publish to done delete data topic to fake the deleteing of results by storage module
-      mediator.publish(DONE + CLOUD_DATA_TOPICS.delete + ':' + uid, mockResultDelete);
+      return Q.resolve(mockResultDelete);
     });
 
     return mediator.request(CLOUD_TOPICS.delete, uid).then(function(deletedResult) {

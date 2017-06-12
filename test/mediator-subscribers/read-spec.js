@@ -4,6 +4,7 @@ var _ = require('lodash');
 var CONSTANTS = require('../../lib/constants');
 var ResultClient = require('../../lib/client/result-client');
 var expect = chai.expect;
+var Q = require('q');
 
 var MediatorTopicUtility = require('fh-wfm-mediator/lib/topics');
 
@@ -15,12 +16,8 @@ describe("Result Read Mediator Topic", function() {
   };
 
   var readTopic = "wfm:results:read";
-  var doneReadTopic = "done:wfm:results:read:resultid";
-  var errorReadTopic = "error:wfm:results:read";
 
   var syncReadTopic = "wfm:sync:result:read";
-  var doneSyncReadTopic = "done:wfm:sync:result:read:resultid";
-  var errorSyncReadTopic = "error:wfm:sync:result:read:resultid";
 
   var resultSubscribers = new MediatorTopicUtility(mediator);
   resultSubscribers.prefix(CONSTANTS.TOPIC_PREFIX).entity(CONSTANTS.RESULT_ENTITY_NAME);
@@ -45,26 +42,17 @@ describe("Result Read Mediator Topic", function() {
   it('should use the sync topics to read result', function() {
     this.subscribers[syncReadTopic] = mediator.subscribe(syncReadTopic, function(parameters) {
       expect(parameters.id).to.be.a('string');
-      expect(parameters.topicUid).to.equal(mockResult.id);
 
-      mediator.publish(doneSyncReadTopic, mockResult);
+      return Q.resolve(mockResult);
     });
 
-    var donePromise = mediator.promise(doneReadTopic);
-
-    mediator.publish(readTopic, {id: mockResult.id, topicUid: mockResult.id});
-
-    return donePromise.then(function(readResult) {
+    return  mediator.publish(readTopic, {id: mockResult.id}).then(function(readResult) {
       expect(readResult).to.deep.equal(mockResult);
     });
   });
 
   it('should publish an error if there is no ID to read', function() {
-    var errorPromise = mediator.promise(errorReadTopic);
-
-    mediator.publish(readTopic);
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(readTopic).catch(function(error) {
       expect(error.message).to.have.string("Expected An ID");
     });
   });
@@ -73,16 +61,11 @@ describe("Result Read Mediator Topic", function() {
     var expectedError = new Error("Error performing sync operation");
     this.subscribers[syncReadTopic] = mediator.subscribe(syncReadTopic, function(parameters) {
       expect(parameters.id).to.be.a('string');
-      expect(parameters.topicUid).to.equal(mockResult.id);
 
-      mediator.publish(errorSyncReadTopic, expectedError);
+      return Q.reject(expectedError);
     });
 
-    var errorPromise = mediator.promise(errorReadTopic + ":" + mockResult.id);
-
-    mediator.publish(readTopic, {id: mockResult.id, topicUid: mockResult.id});
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(readTopic, {id: mockResult.id}).catch(function(error) {
       expect(error).to.deep.equal(expectedError);
     });
   });

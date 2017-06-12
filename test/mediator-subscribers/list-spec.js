@@ -4,6 +4,7 @@ var _ = require('lodash');
 var CONSTANTS = require('../../lib/constants');
 var ResultClient = require('../../lib/client/result-client');
 var expect = chai.expect;
+var Q = require('q');
 
 var MediatorTopicUtility = require('fh-wfm-mediator/lib/topics');
 
@@ -17,12 +18,8 @@ describe("Result List Mediator Topic", function() {
   var results = [_.clone(mockResult), _.clone(mockResult)];
 
   var listTopic = "wfm:results:list";
-  var doneListTopic = "done:wfm:results:list";
-  var errorListTopic = "error:wfm:results:list";
 
   var syncListTopic = "wfm:sync:result:list";
-  var doneSyncListTopic = "done:wfm:sync:result:list";
-  var errorSyncListTopic = "error:wfm:sync:result:list";
 
   var resultClient = ResultClient(mediator);
 
@@ -44,14 +41,10 @@ describe("Result List Mediator Topic", function() {
 
   it('should use the sync topics to list results', function() {
     this.subscribers[syncListTopic] = mediator.subscribe(syncListTopic, function() {
-      mediator.publish(doneSyncListTopic, results);
+      return Q.resolve(results);
     });
 
-    var donePromise = mediator.promise(doneListTopic);
-
-    mediator.publish(listTopic);
-
-    return donePromise.then(function(arrayOfResults) {
+    return mediator.publish(listTopic).then(function(arrayOfResults) {
       expect(arrayOfResults).to.deep.equal(results);
     });
   });
@@ -59,14 +52,10 @@ describe("Result List Mediator Topic", function() {
   it('should handle an error from the sync create topic', function() {
     var expectedError = new Error("Error performing sync operation");
     this.subscribers[syncListTopic] = mediator.subscribe(syncListTopic, function() {
-      mediator.publish(errorSyncListTopic, expectedError);
+      return Q.reject(expectedError);
     });
 
-    var errorPromise = mediator.promise(errorListTopic);
-
-    mediator.publish(listTopic);
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(listTopic).catch(function(error) {
       expect(error).to.deep.equal(expectedError);
     });
   });
