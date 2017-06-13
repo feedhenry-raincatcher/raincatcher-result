@@ -4,6 +4,7 @@ var _ = require('lodash');
 var CONSTANTS = require('../../lib/constants');
 var ResultClient = require('../../lib/client/result-client');
 var expect = chai.expect;
+var Q = require('q');
 
 var MediatorTopicUtility = require('fh-wfm-mediator/lib/topics');
 
@@ -15,12 +16,8 @@ describe("Result Remove Mediator Topic", function() {
   };
 
   var removeTopic = "wfm:results:remove";
-  var doneRemoveTopic = "done:wfm:results:remove:resultid";
-  var errorRemoveTopic = "error:wfm:results:remove";
 
   var syncRemoveTopic = "wfm:sync:result:remove";
-  var doneSyncRemoveTopic = "done:wfm:sync:result:remove:resultid";
-  var errorSyncRemoveTopic = "error:wfm:sync:result:remove:resultid";
 
   var resultClient = ResultClient(mediator);
 
@@ -43,24 +40,16 @@ describe("Result Remove Mediator Topic", function() {
   it('should use the sync topics to remove a result', function() {
     this.subscribers[syncRemoveTopic] = mediator.subscribe(syncRemoveTopic, function(parameters) {
       expect(parameters.id).to.be.a('string');
-      expect(parameters.topicUid).to.equal(mockResult.id);
 
-      mediator.publish(doneSyncRemoveTopic, mockResult);
+      return Q.resolve(mockResult);
     });
 
-    var donePromise = mediator.promise(doneRemoveTopic);
-
-    mediator.publish(removeTopic, {id: mockResult.id, topicUid: mockResult.id});
-
-    return donePromise;
+    return mediator.publish(removeTopic, {id: mockResult.id});
   });
 
   it('should publish an error if there is no ID to remove', function() {
-    var errorPromise = mediator.promise(errorRemoveTopic);
 
-    mediator.publish(removeTopic);
-
-    return errorPromise.then(function(error) {
+    return  mediator.publish(removeTopic).catch(function(error) {
       expect(error.message).to.have.string("Expected An ID");
     });
   });
@@ -69,16 +58,12 @@ describe("Result Remove Mediator Topic", function() {
     var expectedError = new Error("Error performing sync operation");
     this.subscribers[syncRemoveTopic] = mediator.subscribe(syncRemoveTopic, function(parameters) {
       expect(parameters.id).to.be.a('string');
-      expect(parameters.topicUid).to.equal(mockResult.id);
 
-      mediator.publish(errorSyncRemoveTopic, expectedError);
+      return Q.reject(expectedError);
     });
 
-    var errorPromise = mediator.promise(errorRemoveTopic + ":" + mockResult.id);
 
-    mediator.publish(removeTopic, {id: mockResult.id, topicUid: mockResult.id});
-
-    return errorPromise.then(function(error) {
+    return mediator.publish(removeTopic, {id: mockResult.id}).catch(function(error) {
       expect(error).to.deep.equal(expectedError);
     });
   });
